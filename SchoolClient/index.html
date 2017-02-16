@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <title>School Client</title>
+    <meta charset="utf-8" />
+    <link href="Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="Scripts/jquery-3.1.1.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h3>Cors Request</h3>
+        <div class="row bg-info">
+            <div class="col-sm-6">
+                <form id="frmRegister" role="form">
+                    <div class="form-group">
+                        <input type="text" name="Email" placeholder="Email" />
+                    </div>
+                    <div class="form-group">
+                        <input type="password" name="password" placeholder="Password" />
+                    </div>
+                    <div class="form-group">
+                        <input type="password" name="confirmPassword" placeholder="Confirm Password" />
+                    </div>
+                    <div class="form-group">
+                        <input type="button" id="btnRegister" value="Register" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+            <div class="col-sm-6">
+                <form id="frmLogin" role="form">
+                    <input type="hidden" name="grant_type" value="password" />
+                    <div class="form-group">
+                        <input type="text" name="userName" placeholder="UserName" />
+                    </div>
+                    <div class="form-group">
+                        <input type="password" name="password" placeholder="Password" />
+                    </div>
+                    <div class="form-group">
+                        <input type="button" id="btnLogin" value="Login" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+        </div>
+        <button id="btnGet" class="btn btn-primary">Get Students</button>
+        <pre id="preOutput"></pre>
+    </div>
+    <script>
+        var accessToken = "";
+        var baseUrl = "http://localhost:60705/";
+        var saveAccessToken = function (data) {
+            accessToken = data.access_token;
+        };
+        var getHeaders = function () {
+            if (accessToken) {
+                return { "Authorization": "Bearer " + accessToken };
+            }
+        };
+        $(function () {
+            var register = function () {
+                var url = baseUrl + "api/account/register";
+                var data = $("#frmRegister").serialize();
+                $.post(url, data).always(showResponse);
+                return false;
+            };
+            $("#btnRegister").click(register);
+            var getStudents = function () {
+                var url = baseUrl + "api/students/";
+                $.ajax(url, {
+                    type: "GET",
+                    headers: getHeaders()
+                }).always(showResponse);
+                return false;
+            };
+            var login = function () {
+                var url = baseUrl + "Token";
+                var data = $("#frmLogin").serialize();
+                $.post(url, data)
+                    .done(saveAccessToken)
+                    .always(showResponse);
+                return false;
+            };
+            $("#btnLogin").click(login);
+            var showResponse = function(object) {
+                $("#preOutput").text(JSON.stringify(object, null, 4));
+            };
+            $("#btnGet").click(getStudents);
+        });
+    </script>
+</body>
+
+</html>
